@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    environment:
+      POSTGRES_DB: etendo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: syspass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postgres_network
+    ports:
+      - 5432:5432
+  etendo:
+    depends_on:
+     - postgres
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - 8080:8080
+    networks:
+      - postgres_network
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    volumes:
+      - etendo_cache:/home/user/.gradle
+
+volumes:
+  postgres_data:
+  etendo_cache:
+
+networks:
+  postgres_network:
+    driver: bridge
+
